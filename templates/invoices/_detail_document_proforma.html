@@ -1,7 +1,7 @@
 {% load static %}
 {% load humanize %}
-<div class="invoice-screen proforma">
-  <div class="invoice-paper proforma">
+<div class="invoice-screen proforma{% if for_pdf %} invoice-screen--pdf{% endif %}">
+  <div class="invoice-paper proforma{% if for_pdf %} invoice-paper--pdf{% endif %}">
     <div class="invoice-header">
       <div class="brand-block">
         {% if for_pdf and logo_src %}
@@ -121,6 +121,11 @@
     padding: 2.5rem 0;
   }
 
+  .invoice-screen--pdf {
+    display: block;
+    padding: 0;
+  }
+
   .invoice-paper.proforma {
     background: #ffffff;
     color: #111111;
@@ -135,10 +140,21 @@
     box-sizing: border-box;
   }
 
+  .invoice-paper--pdf {
+    box-shadow: none;
+    border: none;
+    max-width: 850px;
+    padding: 1.75rem 1.5rem 1.25rem;
+  }
+
   .invoice-header {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+  }
+
+  .invoice-paper--pdf .invoice-header {
+    gap: 1rem;
   }
 
   .document-meta {
@@ -159,10 +175,19 @@
     letter-spacing: 0.35rem;
   }
 
+  .invoice-paper--pdf .document-title {
+    font-size: 1.3rem;
+    letter-spacing: 0.18rem;
+  }
+
   .recipient-block {
     margin-top: 1.5rem;
     line-height: 1.6;
     font-size: 1rem;
+  }
+
+  .invoice-paper--pdf .recipient-block {
+    margin-top: 0.75rem;
   }
 
   .recipient-label {
@@ -187,16 +212,30 @@
     margin-top: 1.75rem;
     font-size: 1rem;
     line-height: 1.6;
+    page-break-inside: avoid;
+  }
+
+  .invoice-paper--pdf .proforma-body {
+    margin-top: 0.85rem;
+    font-size: 0.95rem;
   }
 
   .intro {
     margin-bottom: 1.25rem;
   }
 
+  .invoice-paper--pdf .intro {
+    margin-bottom: 0.5rem;
+  }
+
   .proforma-table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 1.75rem;
+  }
+
+  .invoice-paper--pdf .proforma-table {
+    margin-bottom: 0.75rem;
   }
 
   .proforma-table th,
@@ -206,12 +245,27 @@
     text-align: left;
   }
 
+  .invoice-paper--pdf .proforma-table th,
+  .invoice-paper--pdf .proforma-table td {
+    padding: 0.45rem 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  .proforma-table tbody tr {
+    page-break-inside: avoid;
+  }
+
   .proforma-table th {
-    width: 35%;
+    width: 32%;
     background: #f7f7f7;
     text-transform: uppercase;
     letter-spacing: 0.08rem;
     font-size: 0.85rem;
+  }
+
+  .invoice-paper--pdf .proforma-table th {
+    letter-spacing: 0.05rem;
+    font-size: 0.8rem;
   }
 
   .total-summary {
@@ -224,6 +278,11 @@
     letter-spacing: 0.04rem;
   }
 
+  .invoice-paper--pdf .total-summary {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+  }
+
   .total-amount {
     font-size: 1.2rem;
   }
@@ -234,6 +293,11 @@
     align-items: center;
     margin-top: 2.5rem;
     gap: 0.5rem;
+    page-break-inside: avoid;
+  }
+
+  .invoice-paper--pdf .signature-block {
+    margin-top: 2.0rem;
   }
 
   .signature-line {
