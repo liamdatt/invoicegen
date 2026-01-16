@@ -80,8 +80,12 @@
     </div>
 
     <div class="signature-block">
-      {% static 'Stepmath_signature-no background.png' as signature_url %}
-      <img src="{{ signature_url }}" alt="Stephen Duhaney Signature" class="signature-image">
+      {% if for_pdf and signature_src %}
+        <img src="{{ signature_src }}" alt="Stephen Duhaney Signature" class="signature-image">
+      {% elif not for_pdf %}
+        {% static 'Stepmath_signature-no background.png' as signature_url %}
+        <img src="{{ signature_url }}" alt="Stephen Duhaney Signature" class="signature-image">
+      {% endif %}
       <div class="signature-line"></div>
       <div class="signature-name">STEPHEN DUHANEY</div>
       <div class="signature-title">DIRECTOR</div>

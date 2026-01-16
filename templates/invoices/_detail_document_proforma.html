@@ -5,10 +5,10 @@
     <div class="invoice-header">
       <div class="brand-block">
         {% if for_pdf and logo_src %}
-          <img src="{{ logo_src }}" alt="Stepmath Auto Limited" class="brand-logo">
+        <img src="{{ logo_src }}" alt="Stepmath Auto Limited" class="brand-logo">
         {% elif not for_pdf %}
-          {% static 'invoicegen/logo.jpeg' as logo_url %}
-          <img src="{{ logo_url }}" alt="Stepmath Auto Limited" class="brand-logo">
+        {% static 'invoicegen/logo.jpeg' as logo_url %}
+        <img src="{{ logo_url }}" alt="Stepmath Auto Limited" class="brand-logo">
         {% endif %}
         <div class="brand-text">
           <div class="brand-name">STEPMATH AUTO LIMITED</div>
@@ -29,7 +29,7 @@
       <p class="recipient-label">To:</p>
       <p class="recipient-name">{{ invoice.client.name }}</p>
       {% if invoice.client.address %}
-        <p class="recipient-address">{{ invoice.client.address|linebreaksbr }}</p>
+      <p class="recipient-address">{{ invoice.client.address|linebreaksbr }}</p>
       {% endif %}
     </div>
 
@@ -39,61 +39,65 @@
       <table class="proforma-table">
         <tbody>
           {% if invoice.proforma_make %}
-            <tr>
-              <th>Make</th>
-              <td>{{ invoice.proforma_make }}</td>
-            </tr>
+          <tr>
+            <th>Make</th>
+            <td>{{ invoice.proforma_make }}</td>
+          </tr>
           {% endif %}
           {% if invoice.proforma_model %}
-            <tr>
-              <th>Model</th>
-              <td>{{ invoice.proforma_model }}</td>
-            </tr>
+          <tr>
+            <th>Model</th>
+            <td>{{ invoice.proforma_model }}</td>
+          </tr>
           {% endif %}
           {% if invoice.proforma_year %}
-            <tr>
-              <th>Year</th>
-              <td>{{ invoice.proforma_year }}</td>
-            </tr>
+          <tr>
+            <th>Year</th>
+            <td>{{ invoice.proforma_year }}</td>
+          </tr>
           {% endif %}
           {% if invoice.chassis_no %}
-            <tr>
-              <th>Chassis #</th>
-              <td>{{ invoice.chassis_no }}</td>
-            </tr>
+          <tr>
+            <th>Chassis #</th>
+            <td>{{ invoice.chassis_no }}</td>
+          </tr>
           {% endif %}
           {% if invoice.proforma_colour %}
-            <tr>
-              <th>Colour</th>
-              <td>{{ invoice.proforma_colour }}</td>
-            </tr>
+          <tr>
+            <th>Colour</th>
+            <td>{{ invoice.proforma_colour }}</td>
+          </tr>
           {% endif %}
           {% if invoice.proforma_cc_rating %}
-            <tr>
-              <th>CC Rating</th>
-              <td>{{ invoice.proforma_cc_rating }}</td>
-            </tr>
+          <tr>
+            <th>CC Rating</th>
+            <td>{{ invoice.proforma_cc_rating }}</td>
+          </tr>
           {% endif %}
           {% if invoice.vehicle %}
-            <tr>
-              <th>Description</th>
-              <td>{{ invoice.vehicle }}</td>
-            </tr>
+          <tr>
+            <th>Description</th>
+            <td>{{ invoice.vehicle }}</td>
+          </tr>
           {% endif %}
         </tbody>
       </table>
 
       {% if invoice.proforma_total_formatted %}
-        <div class="total-summary">
-          <span class="total-label">Total Cost:</span>
-          <span class="total-amount">{{ invoice.proforma_total_formatted }}</span>
-        </div>
+      <div class="total-summary">
+        <span class="total-label">Total Cost:</span>
+        <span class="total-amount">{{ invoice.proforma_total_formatted }}</span>
+      </div>
       {% endif %}
     </div>
 
     <div class="signature-block">
+      {% if for_pdf and signature_src %}
+      <img src="{{ signature_src }}" alt="Stephen Duhaney Signature" class="signature-image">
+      {% elif not for_pdf %}
       {% static 'Stepmath_signature-no background.png' as signature_url %}
       <img src="{{ signature_url }}" alt="Stephen Duhaney Signature" class="signature-image">
+      {% endif %}
       <div class="signature-line"></div>
       <div class="signature-name">STEPHEN DUHANEY</div>
       <div class="signature-title">DIRECTOR</div>
@@ -101,16 +105,17 @@
   </div>
 
   {% if not for_pdf %}
-    <div class="actions">
-      <a href="{% url 'invoice_update' invoice.pk %}" class="btn btn-outline-secondary btn-sm">Edit Invoice</a>
-      <a href="{% url 'invoice_pdf' invoice.pk %}" class="btn btn-primary btn-sm">Download PDF</a>
-      <a href="{% url 'clients_detail' invoice.client.pk %}" class="btn btn-outline-secondary btn-sm">View Client</a>
-      <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-sm">Back to Dashboard</a>
-      <form action="{% url 'invoice_delete' invoice.pk %}" method="post" onsubmit="return confirm('Delete this invoice? This action cannot be undone.');}">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger btn-sm">Delete Invoice</button>
-      </form>
-    </div>
+  <div class="actions">
+    <a href="{% url 'invoice_update' invoice.pk %}" class="btn btn-outline-secondary btn-sm">Edit Invoice</a>
+    <a href="{% url 'invoice_pdf' invoice.pk %}" class="btn btn-primary btn-sm">Download PDF</a>
+    <a href="{% url 'clients_detail' invoice.client.pk %}" class="btn btn-outline-secondary btn-sm">View Client</a>
+    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-sm">Back to Dashboard</a>
+    <form action="{% url 'invoice_delete' invoice.pk %}" method="post"
+      onsubmit="return confirm('Delete this invoice? This action cannot be undone.');">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger btn-sm">Delete Invoice</button>
+    </form>
+  </div>
   {% endif %}
 </div>
 
@@ -146,7 +151,7 @@
     box-shadow: none;
     border: none;
     max-width: 850px;
-    padding: 1.75rem 1.5rem 1.25rem;
+    padding: 0.5rem 1.25rem 0.5rem;
   }
 
   .invoice-header {
@@ -156,7 +161,17 @@
   }
 
   .invoice-paper--pdf .invoice-header {
-    gap: 1rem;
+    gap: 0.25rem;
+  }
+
+  .brand-logo {
+    width: 120px;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .invoice-paper--pdf .brand-logo {
+    width: 100px;
   }
 
   .document-meta {
@@ -189,7 +204,7 @@
   }
 
   .invoice-paper--pdf .recipient-block {
-    margin-top: 0.75rem;
+    margin-top: 0.25rem;
   }
 
   .recipient-label {
@@ -218,8 +233,8 @@
   }
 
   .invoice-paper--pdf .proforma-body {
-    margin-top: 0.85rem;
-    font-size: 0.95rem;
+    margin-top: 0.25rem;
+    font-size: 0.9rem;
   }
 
   .intro {
@@ -227,7 +242,7 @@
   }
 
   .invoice-paper--pdf .intro {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
   }
 
   .proforma-table {
@@ -237,7 +252,7 @@
   }
 
   .invoice-paper--pdf .proforma-table {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.25rem;
   }
 
   .proforma-table th,
@@ -249,8 +264,8 @@
 
   .invoice-paper--pdf .proforma-table th,
   .invoice-paper--pdf .proforma-table td {
-    padding: 0.45rem 0.6rem;
-    font-size: 0.9rem;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.85rem;
   }
 
   .proforma-table tbody tr {
@@ -281,7 +296,7 @@
   }
 
   .invoice-paper--pdf .total-summary {
-    margin-top: 0.5rem;
+    margin-top: 0.25rem;
     font-size: 1rem;
   }
 
@@ -289,17 +304,21 @@
     font-size: 1.2rem;
   }
 
+  .total-summary,
+  .signature-block {
+    page-break-inside: avoid;
+  }
+
   .signature-block {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 2.5rem;
-    gap: 0.5rem;
-    page-break-inside: avoid;
+    margin-top: 1.5rem;
+    gap: 0.25rem;
   }
 
   .signature-image {
-    width: 140px;
+    width: 100px;
     height: auto;
     object-fit: contain;
     position: relative;
@@ -307,7 +326,7 @@
   }
 
   .invoice-paper--pdf .signature-block {
-    margin-top: 2.0Brem;
+    margin-top: 0.25rem;
   }
 
   .signature-line {

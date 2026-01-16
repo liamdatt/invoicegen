@@ -110,6 +110,32 @@ class Invoice(models.Model):
         except Exception:
             return logo_path.resolve().as_uri()
 
+    def _signature_data_url(self) -> str | None:
+        signature_path = None
+        for candidate in ("Stepmath_signature-no background.png", "resources/Stepmath_signature-no background.png"):
+            resolved = finders.find(candidate)
+            if resolved:
+                signature_path = Path(resolved)
+                break
+
+        # Also check direct path in resources folder
+        if not signature_path:
+            resources_path = Path(settings.BASE_DIR) / "resources" / "Stepmath_signature-no background.png"
+            if resources_path.exists():
+                signature_path = resources_path
+
+        if not signature_path or not signature_path.exists():
+            return None
+
+        try:
+            import base64
+
+            with open(signature_path, "rb") as f:
+                signature_data = f.read()
+            return f"data:image/png;base64,{base64.b64encode(signature_data).decode()}"
+        except Exception:
+            return signature_path.resolve().as_uri()
+
     def _render_pdf(self, template_name: str) -> bytes:
         try:
             from playwright.sync_api import Error as PlaywrightError, sync_playwright
@@ -120,6 +146,7 @@ class Invoice(models.Model):
             ) from exc
 
         logo_data_url = self._logo_data_url()
+        signature_data_url = self._signature_data_url()
 
         html = render_to_string(
             template_name,
@@ -127,6 +154,7 @@ class Invoice(models.Model):
                 "invoice": self,
                 "for_pdf": True,
                 "logo_src": logo_data_url,
+                "signature_src": signature_data_url,
             },
         )
 
