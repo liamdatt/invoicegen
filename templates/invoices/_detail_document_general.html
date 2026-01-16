@@ -80,6 +80,8 @@
     </div>
 
     <div class="signature-block">
+      {% static 'Stepmath_signature-no background.png' as signature_url %}
+      <img src="{{ signature_url }}" alt="Stephen Duhaney Signature" class="signature-image">
       <div class="signature-line"></div>
       <div class="signature-name">STEPHEN DUHANEY</div>
       <div class="signature-title">DIRECTOR</div>
@@ -286,6 +288,14 @@
     align-items: center;
     margin-top: 2.5rem;
     gap: 0.5rem;
+  }
+
+  .signature-image {
+    width: 140px;
+    height: auto;
+    object-fit: contain;
+    position: relative;
+    top: 8px;
   }
 
   .signature-line {
