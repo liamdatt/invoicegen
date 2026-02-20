@@ -17,8 +17,8 @@
             </div>
           </div>
           <div class="col-lg-4 text-center">
-            <div class="d-inline-flex align-items-center justify-content-center" 
-                 style="width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; backdrop-filter: blur(10px);">
+            <div class="d-inline-flex align-items-center justify-content-center"
+              style="width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; backdrop-filter: blur(10px);">
               <i class="bi bi-people" style="font-size: 3rem; color: rgba(255,255,255,0.8);"></i>
             </div>
           </div>
@@ -45,11 +45,8 @@
           <div class="col-lg-8 mx-auto">
             <div class="search-container mb-4">
               <i class="bi bi-search search-icon"></i>
-              <input type="text" 
-                     class="form-control" 
-                     id="clientSearch" 
-                     placeholder="Search clients by name or email to create invoice..."
-                     autocomplete="off">
+              <input type="text" class="form-control" id="clientSearch"
+                placeholder="Search clients by name or email to create invoice..." autocomplete="off">
               <div id="searchResults" class="search-results"></div>
             </div>
           </div>
@@ -83,46 +80,46 @@
         <div class="d-flex align-items-center justify-content-between">
           <div class="d-flex align-items-center">
             <div class="me-4">
-              <div class="d-inline-flex align-items-center justify-content-center" 
-                   style="width: 60px; height: 60px; background: var(--accent-gradient); border-radius: var(--border-radius-lg);">
+              <div class="d-inline-flex align-items-center justify-content-center"
+                style="width: 60px; height: 60px; background: var(--accent-gradient); border-radius: var(--border-radius-lg);">
                 <i class="bi bi-google" style="font-size: 1.5rem; color: white;"></i>
               </div>
             </div>
             <div>
               <h5 class="display-title mb-1">Google Workspace</h5>
               {% if google_account and google_account.is_connected %}
-                <p class="text-muted mb-1">Connected as <strong>{{ google_email|default:"Unknown" }}</strong></p>
-                {% if google_drive_folder %}
-                  <p class="text-muted mb-0 small">
-                    <i class="bi bi-folder-check me-1" style="color: var(--accent-color);"></i>
-                    Syncing to: <strong>{{ google_drive_folder }}</strong>
-                  </p>
-                {% else %}
-                  <p class="text-muted mb-0 small">
-                    <i class="bi bi-folder-x me-1" style="color: var(--text-muted);"></i>
-                    Choose a Drive folder for automatic backup
-                  </p>
-                {% endif %}
+              <p class="text-muted mb-1">Connected as <strong>{{ google_email|default:"Unknown" }}</strong></p>
+              {% if google_drive_folder %}
+              <p class="text-muted mb-0 small">
+                <i class="bi bi-folder-check me-1" style="color: var(--accent-color);"></i>
+                Syncing to: <strong>{{ google_drive_folder }}</strong>
+              </p>
               {% else %}
-                <p class="text-muted mb-0">Connect for automatic email delivery and Drive backup</p>
+              <p class="text-muted mb-0 small">
+                <i class="bi bi-folder-x me-1" style="color: var(--text-muted);"></i>
+                Choose a Drive folder for automatic backup
+              </p>
+              {% endif %}
+              {% else %}
+              <p class="text-muted mb-0">Connect for automatic email delivery and Drive backup</p>
               {% endif %}
             </div>
           </div>
           <div class="d-flex gap-2">
             {% if google_account and google_account.is_connected %}
-              <a class="btn btn-outline-primary" href="{% url 'google_drive_select' %}">
-                <i class="bi bi-folder2-open me-1"></i>Configure Drive
-              </a>
-              <form method="post" action="{% url 'google_disconnect' %}" class="d-inline">
-                {% csrf_token %}
-                <button class="btn btn-outline-secondary" type="submit">
-                  <i class="bi bi-plug-fill me-1"></i>Disconnect
-                </button>
-              </form>
+            <a class="btn btn-outline-primary" href="{% url 'google_drive_select' %}">
+              <i class="bi bi-folder2-open me-1"></i>Configure Drive
+            </a>
+            <form method="post" action="{% url 'google_disconnect' %}" class="d-inline">
+              {% csrf_token %}
+              <button class="btn btn-outline-secondary" type="submit">
+                <i class="bi bi-plug-fill me-1"></i>Disconnect
+              </button>
+            </form>
             {% else %}
-              <a class="btn btn-primary" href="{% url 'google_connect' %}">
-                <i class="bi bi-google me-1"></i>Connect Google
-              </a>
+            <a class="btn btn-primary" href="{% url 'google_connect' %}">
+              <i class="bi bi-google me-1"></i>Connect Google
+            </a>
             {% endif %}
           </div>
         </div>
@@ -138,7 +135,8 @@
         <i class="bi bi-info-circle me-3" style="font-size: 1.5rem; color: var(--accent-color);"></i>
         <div>
           <h6 class="fw-bold mb-1">Google Integration Available</h6>
-          <p class="mb-0">Configure <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> to enable automatic email delivery and Drive backup.</p>
+          <p class="mb-0">Configure <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> to enable
+            automatic email delivery and Drive backup.</p>
         </div>
       </div>
     </div>
@@ -155,8 +153,8 @@
         <div class="d-flex align-items-center justify-content-between">
           <div class="d-flex align-items-center">
             <div class="me-3">
-              <div class="d-inline-flex align-items-center justify-content-center" 
-                   style="width: 40px; height: 40px; background: var(--primary-gradient); border-radius: var(--border-radius);">
+              <div class="d-inline-flex align-items-center justify-content-center"
+                style="width: 40px; height: 40px; background: var(--primary-gradient); border-radius: var(--border-radius);">
                 <i class="bi bi-people" style="color: white; font-size: 1rem;"></i>
               </div>
             </div>
@@ -173,50 +171,52 @@
       <div class="card-body p-0">
         <div class="list-group list-group-flush">
           {% for c in clients|slice:":5" %}
-            <div class="list-group-item d-flex justify-content-between align-items-center">
-              <div class="d-flex align-items-center flex-grow-1">
-                <div class="me-3">
-                  <div class="d-inline-flex align-items-center justify-content-center" 
-                       style="width: 45px; height: 45px; background: var(--primary-gradient); border-radius: 50%; box-shadow: var(--glow-primary);">
-                    <span style="color: white; font-weight: 700; font-size: 1rem;">{{ c.name|first|upper }}</span>
-                  </div>
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center flex-grow-1">
+              <div class="me-3">
+                <div class="d-inline-flex align-items-center justify-content-center"
+                  style="width: 45px; height: 45px; background: var(--primary-gradient); border-radius: 50%; box-shadow: var(--glow-primary);">
+                  <span style="color: white; font-weight: 700; font-size: 1rem;">{{ c.name|first|upper }}</span>
                 </div>
-                <div class="flex-grow-1">
-                  <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                      <a href="{% url 'clients_detail' c.pk %}" class="fw-bold text-decoration-none" style="color: var(--text-primary);">
-                        {{ c.name }}
-                      </a>
-                      <div class="small text-muted">
-                        <i class="bi bi-envelope me-1"></i>{{ c.email|default:"No email provided" }}
-                      </div>
+              </div>
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <a href="{% url 'clients_detail' c.pk %}" class="fw-bold text-decoration-none"
+                      style="color: var(--text-primary);">
+                      {{ c.name }}
+                    </a>
+                    <div class="small text-muted">
+                      <i class="bi bi-envelope me-1"></i>{{ c.email|default:"No email provided" }}
                     </div>
-                    <div class="d-flex gap-1">
-                      <a class="btn btn-outline-primary btn-sm" href="{% url 'clients_update' c.pk %}" title="Edit Client">
-                        <i class="bi bi-pencil"></i>
-                      </a>
-                      <a class="btn btn-primary btn-sm" href="{% url 'invoice_create' c.pk %}" title="Create Invoice">
-                        <i class="bi bi-file-plus"></i>
-                      </a>
-                    </div>
+                  </div>
+                  <div class="d-flex gap-1">
+                    <a class="btn btn-outline-primary btn-sm" href="{% url 'clients_update' c.pk %}"
+                      title="Edit Client">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                    <a class="btn btn-primary btn-sm" href="{% url 'invoice_create' c.pk %}" title="Create Invoice">
+                      <i class="bi bi-file-plus"></i>
+                    </a>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
           {% empty %}
-            <div class="text-center py-5">
-              <div class="mb-4">
-                <div class="d-inline-flex align-items-center justify-content-center" 
-                     style="width: 80px; height: 80px; background: var(--bg-glass); border-radius: 50%; border: 2px dashed var(--border-color);">
-                  <i class="bi bi-person-plus" style="font-size: 2rem; color: var(--text-muted);"></i>
-                </div>
+          <div class="text-center py-5">
+            <div class="mb-4">
+              <div class="d-inline-flex align-items-center justify-content-center"
+                style="width: 80px; height: 80px; background: var(--bg-glass); border-radius: 50%; border: 2px dashed var(--border-color);">
+                <i class="bi bi-person-plus" style="font-size: 2rem; color: var(--text-muted);"></i>
               </div>
-              <h6 class="text-muted mb-2">No clients yet</h6>
-              <p class="text-muted small mb-3">Start building your client base</p>
-              <a class="btn btn-primary" href="{% url 'clients_create' %}">
-                <i class="bi bi-person-plus me-2"></i>Add Your First Client
-              </a>
             </div>
+            <h6 class="text-muted mb-2">No clients yet</h6>
+            <p class="text-muted small mb-3">Start building your client base</p>
+            <a class="btn btn-primary" href="{% url 'clients_create' %}">
+              <i class="bi bi-person-plus me-2"></i>Add Your First Client
+            </a>
+          </div>
           {% endfor %}
         </div>
       </div>
@@ -225,13 +225,13 @@
 
   <!-- Recent Invoices Section -->
   <div class="col-lg-6">
-    <div class="card h-100 fade-in glass" style="animation-delay: 0.8s;">
-      <div class="card-header">
+    <div class="card h-100 fade-in glass" style="animation-delay: 0.8s; overflow: visible;">
+      <div class="card-header" style="position: relative; z-index: 10; overflow: visible;">
         <div class="d-flex align-items-center justify-content-between">
           <div class="d-flex align-items-center">
             <div class="me-3">
-              <div class="d-inline-flex align-items-center justify-content-center" 
-                   style="width: 40px; height: 40px; background: var(--secondary-gradient); border-radius: var(--border-radius);">
+              <div class="d-inline-flex align-items-center justify-content-center"
+                style="width: 40px; height: 40px; background: var(--secondary-gradient); border-radius: var(--border-radius);">
                 <i class="bi bi-file-earmark-text" style="color: white; font-size: 1rem;"></i>
               </div>
             </div>
@@ -246,15 +246,16 @@
               <i class="bi bi-plus me-1"></i>Create
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
-          {% for c in clients %}
-                <li>
-                  <a class="dropdown-item d-flex align-items-center" href="{% url 'invoice_create' c.pk %}">
-                    <div class="me-2" style="width: 20px; height: 20px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: white; font-weight: bold;">
-                      {{ c.name|first|upper }}
-                    </div>
-                    {{ c.name }}
-                  </a>
-                </li>
+              {% for c in clients %}
+              <li>
+                <a class="dropdown-item d-flex align-items-center" href="{% url 'invoice_create' c.pk %}">
+                  <div class="me-2"
+                    style="width: 20px; height: 20px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: white; font-weight: bold;">
+                    {{ c.name|first|upper }}
+                  </div>
+                  {{ c.name }}
+                </a>
+              </li>
               {% endfor %}
             </ul>
           </div>
@@ -264,127 +265,130 @@
       <div class="card-body p-0">
         <div class="list-group list-group-flush">
           {% for inv in invoices|slice:":5" %}
-            <div class="list-group-item">
-              <div class="d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center flex-grow-1">
-                  <div class="me-3">
-                    <div class="d-inline-flex align-items-center justify-content-center" 
-                         style="width: 45px; height: 45px; background: var(--accent-gradient); border-radius: var(--border-radius-lg); box-shadow: var(--glow-accent);">
-                      <i class="bi bi-file-earmark-text" style="color: white; font-size: 1rem;"></i>
-                    </div>
+          <div class="list-group-item">
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center flex-grow-1">
+                <div class="me-3">
+                  <div class="d-inline-flex align-items-center justify-content-center"
+                    style="width: 45px; height: 45px; background: var(--accent-gradient); border-radius: var(--border-radius-lg); box-shadow: var(--glow-accent);">
+                    <i class="bi bi-file-earmark-text" style="color: white; font-size: 1rem;"></i>
                   </div>
-                  <div class="flex-grow-1">
-                    <div class="d-flex align-items-center justify-content-between">
-                      <div>
-                        <a href="{% url 'invoice_detail' inv.pk %}" class="fw-bold text-decoration-none" style="color: var(--text-primary);">
-                          Invoice #{{ inv.pk }}
-                        </a>
-                        <div class="small text-muted">
-                          <i class="bi bi-person me-1"></i>{{ inv.client.name }}
-                        </div>
-                        <div class="d-flex gap-3 small text-muted mt-1">
-                          <span><i class="bi bi-calendar3 me-1"></i>{{ inv.date }}</span>
-                          <span><i class="bi bi-tag me-1"></i>{{ inv.get_invoice_type_display }}</span>
-                        </div>
+                </div>
+                <div class="flex-grow-1">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                      <a href="{% url 'invoice_detail' inv.pk %}" class="fw-bold text-decoration-none"
+                        style="color: var(--text-primary);">
+                        Invoice #{{ inv.pk }}
+                      </a>
+                      <div class="small text-muted">
+                        <i class="bi bi-person me-1"></i>{{ inv.client.name }}
                       </div>
-                      <div class="text-end">
-                        <a class="btn btn-outline-primary btn-sm" href="{% url 'invoice_pdf' inv.pk %}" title="Download PDF">
-                          <i class="bi bi-download"></i>
-                        </a>
+                      <div class="d-flex gap-3 small text-muted mt-1">
+                        <span><i class="bi bi-calendar3 me-1"></i>{{ inv.date }}</span>
+                        <span><i class="bi bi-tag me-1"></i>{{ inv.get_invoice_type_display }}</span>
                       </div>
+                    </div>
+                    <div class="text-end">
+                      <a class="btn btn-outline-primary btn-sm" href="{% url 'invoice_pdf' inv.pk %}"
+                        title="Download PDF">
+                        <i class="bi bi-download"></i>
+                      </a>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-        {% empty %}
-            <div class="text-center py-5">
-              <div class="mb-4">
-                <div class="d-inline-flex align-items-center justify-content-center" 
-                     style="width: 80px; height: 80px; background: var(--bg-glass); border-radius: 50%; border: 2px dashed var(--border-color);">
-                  <i class="bi bi-file-earmark-plus" style="font-size: 2rem; color: var(--text-muted);"></i>
-                </div>
+          </div>
+          {% empty %}
+          <div class="text-center py-5">
+            <div class="mb-4">
+              <div class="d-inline-flex align-items-center justify-content-center"
+                style="width: 80px; height: 80px; background: var(--bg-glass); border-radius: 50%; border: 2px dashed var(--border-color);">
+                <i class="bi bi-file-earmark-plus" style="font-size: 2rem; color: var(--text-muted);"></i>
               </div>
-              <h6 class="text-muted mb-2">No invoices yet</h6>
-              <p class="text-muted small mb-3">Start creating professional invoices</p>
-              {% if clients %}
-                <div class="dropdown">
-                  <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    <i class="bi bi-plus me-2"></i>Create Your First Invoice
-                  </button>
-                  <ul class="dropdown-menu">
-                    {% for c in clients %}
-                      <li>
-                        <a class="dropdown-item d-flex align-items-center" href="{% url 'invoice_create' c.pk %}">
-                          <div class="me-2" style="width: 20px; height: 20px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: white; font-weight: bold;">
-                            {{ c.name|first|upper }}
-                          </div>
-                          {{ c.name }}
-                        </a>
-                      </li>
-          {% endfor %}
-        </ul>
-                </div>
-              {% else %}
-                <p class="text-muted small mt-3">Add a client first to create invoices</p>
-              {% endif %}
             </div>
+            <h6 class="text-muted mb-2">No invoices yet</h6>
+            <p class="text-muted small mb-3">Start creating professional invoices</p>
+            {% if clients %}
+            <div class="dropdown">
+              <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-plus me-2"></i>Create Your First Invoice
+              </button>
+              <ul class="dropdown-menu">
+                {% for c in clients %}
+                <li>
+                  <a class="dropdown-item d-flex align-items-center" href="{% url 'invoice_create' c.pk %}">
+                    <div class="me-2"
+                      style="width: 20px; height: 20px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: white; font-weight: bold;">
+                      {{ c.name|first|upper }}
+                    </div>
+                    {{ c.name }}
+                  </a>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% else %}
+            <p class="text-muted small mt-3">Add a client first to create invoices</p>
+            {% endif %}
+          </div>
           {% endfor %}
         </div>
       </div>
     </div>
-    </div>
   </div>
+</div>
 
 
 <!-- Search Functionality -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('clientSearch');
     const searchResults = document.getElementById('searchResults');
-    
+
     // Client data for search
     const clients = [
-        {% for client in clients %}
+      {% for client in clients %}
         {
-            id: {{ client.pk }},
-            name: "{{ client.name|escapejs }}",
-            email: "{{ client.email|default:''|escapejs }}",
-            createInvoiceUrl: "{% url 'invoice_create' client.pk %}",
-            detailUrl: "{% url 'clients_detail' client.pk %}"
+      id: {{ client.pk }},
+    name: "{{ client.name|escapejs }}",
+    email: "{{ client.email|default:''|escapejs }}",
+    createInvoiceUrl: "{% url 'invoice_create' client.pk %}",
+    detailUrl: "{% url 'clients_detail' client.pk %}"
         },
-        {% endfor %}
+    {% endfor %}
     ];
-    
-    let searchTimeout;
-    
-    searchInput.addEventListener('input', function() {
-        const query = this.value.trim().toLowerCase();
-        
-        // Clear previous timeout
-        clearTimeout(searchTimeout);
-        
-        // Debounce search
-        searchTimeout = setTimeout(() => {
-            if (query.length === 0) {
-                searchResults.style.display = 'none';
-                return;
-            }
-            
-            // Filter clients
-            const filteredClients = clients.filter(client => 
-                client.name.toLowerCase().includes(query) || 
-                client.email.toLowerCase().includes(query)
-            );
-            
-            // Display results
-            displaySearchResults(filteredClients, query);
-        }, 300);
-    });
-    
-    function displaySearchResults(results, query) {
-        if (results.length === 0) {
-            searchResults.innerHTML = `
+
+  let searchTimeout;
+
+  searchInput.addEventListener('input', function () {
+    const query = this.value.trim().toLowerCase();
+
+    // Clear previous timeout
+    clearTimeout(searchTimeout);
+
+    // Debounce search
+    searchTimeout = setTimeout(() => {
+      if (query.length === 0) {
+        searchResults.style.display = 'none';
+        return;
+      }
+
+      // Filter clients
+      const filteredClients = clients.filter(client =>
+        client.name.toLowerCase().includes(query) ||
+        client.email.toLowerCase().includes(query)
+      );
+
+      // Display results
+      displaySearchResults(filteredClients, query);
+    }, 300);
+  });
+
+  function displaySearchResults(results, query) {
+    if (results.length === 0) {
+      searchResults.innerHTML = `
                 <div class="no-results">
                     <i class="bi bi-search" style="font-size: 2rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
                     <p>No clients found for "${query}"</p>
@@ -393,8 +397,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     </a>
                 </div>
             `;
-        } else {
-            searchResults.innerHTML = results.map(client => `
+    } else {
+      searchResults.innerHTML = results.map(client => `
                 <div class="search-result-item" data-client-id="${client.id}">
                     <div class="d-flex align-items-center flex-grow-1">
                         <div class="me-3">
@@ -420,30 +424,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             `).join('');
-        }
-        
-        searchResults.style.display = 'block';
     }
-    
-    // Close search results when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-            searchResults.style.display = 'none';
-        }
-    });
-    
-    // Handle search result clicks
-    searchResults.addEventListener('click', function(e) {
-        const resultItem = e.target.closest('.search-result-item');
-        if (resultItem && e.target.tagName !== 'A') {
-            const createInvoiceLink = resultItem.querySelector('a[title="Create Invoice"]');
-            if (createInvoiceLink) {
-                window.location.href = createInvoiceLink.href;
-            }
-        }
-    });
+
+    searchResults.style.display = 'block';
+  }
+
+  // Close search results when clicking outside
+  document.addEventListener('click', function (e) {
+    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+      searchResults.style.display = 'none';
+    }
+  });
+
+  // Handle search result clicks
+  searchResults.addEventListener('click', function (e) {
+    const resultItem = e.target.closest('.search-result-item');
+    if (resultItem && e.target.tagName !== 'A') {
+      const createInvoiceLink = resultItem.querySelector('a[title="Create Invoice"]');
+      if (createInvoiceLink) {
+        window.location.href = createInvoiceLink.href;
+      }
+    }
+  });
 });
 </script>
 {% endblock %}
-
-
