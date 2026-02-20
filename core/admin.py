@@ -11,7 +11,7 @@ class InvoiceItemInline(admin.TabularInline):
 class InvoiceAdmin(admin.ModelAdmin):
     list_display = ('id', 'client', 'invoice_type', 'date', 'vehicle', 'total_display')
     list_filter = ('invoice_type', 'date')
-    search_fields = ('client__name', 'vehicle', 'lic_no', 'chassis_no')
+    search_fields = ('client__name', 'vehicle', 'lic_no', 'chassis_no', 'engine_no')
     inlines = [InvoiceItemInline]
 
     def total_display(self, obj):

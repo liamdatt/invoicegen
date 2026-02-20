@@ -5,10 +5,10 @@
     <div class="invoice-header">
       <div class="brand-block">
         {% if for_pdf and logo_src %}
-          <img src="{{ logo_src }}" alt="Stepmath Auto Limited" class="brand-logo">
+        <img src="{{ logo_src }}" alt="Stepmath Auto Limited" class="brand-logo">
         {% elif not for_pdf %}
-          {% static 'invoicegen/logo.jpeg' as logo_url %}
-          <img src="{{ logo_url }}" alt="Stepmath Auto Limited" class="brand-logo">
+        {% static 'invoicegen/logo.jpeg' as logo_url %}
+        <img src="{{ logo_url }}" alt="Stepmath Auto Limited" class="brand-logo">
         {% endif %}
         <div class="brand-text">
           <div class="brand-name">STEPMATH AUTO LIMITED</div>
@@ -28,6 +28,7 @@
         <div><span class="meta-label">Vehicle:</span> {{ invoice.vehicle|default:"" }}</div>
         <div><span class="meta-label">Lic#:</span> {{ invoice.lic_no|default:"" }}</div>
         <div><span class="meta-label">Chassis#:</span> {{ invoice.chassis_no|default:"" }}</div>
+        <div><span class="meta-label">Engine#:</span> {{ invoice.engine_no|default:"" }}</div>
       </div>
       <div class="meta-col align-end">
         <div><span class="meta-label">Date:</span> {{ invoice.date|date:"j-M-y" }}</div>
@@ -46,17 +47,17 @@
       </thead>
       <tbody>
         {% if invoice.items.all %}
-          {% for it in invoice.items.all %}
-            <tr>
-              <td class="description">{{ it.description }}</td>
-              <td class="labour">${{ it.labour_cost|floatformat:2|intcomma }}</td>
-              <td class="parts">${{ it.parts_cost|floatformat:2|intcomma }}</td>
-            </tr>
-          {% endfor %}
+        {% for it in invoice.items.all %}
+        <tr>
+          <td class="description">{{ it.description }}</td>
+          <td class="labour">${{ it.labour_cost|floatformat:2|intcomma }}</td>
+          <td class="parts">${{ it.parts_cost|floatformat:2|intcomma }}</td>
+        </tr>
+        {% endfor %}
         {% else %}
-          <tr>
-            <td class="description" colspan="3">No invoice items have been added yet.</td>
-          </tr>
+        <tr>
+          <td class="description" colspan="3">No invoice items have been added yet.</td>
+        </tr>
         {% endif %}
       </tbody>
     </table>
@@ -81,10 +82,10 @@
 
     <div class="signature-block">
       {% if for_pdf and signature_src %}
-        <img src="{{ signature_src }}" alt="Stephen Duhaney Signature" class="signature-image">
+      <img src="{{ signature_src }}" alt="Stephen Duhaney Signature" class="signature-image">
       {% elif not for_pdf %}
-        {% static 'Stepmath_signature-no background.png' as signature_url %}
-        <img src="{{ signature_url }}" alt="Stephen Duhaney Signature" class="signature-image">
+      {% static 'Stepmath_signature-no background.png' as signature_url %}
+      <img src="{{ signature_url }}" alt="Stephen Duhaney Signature" class="signature-image">
       {% endif %}
       <div class="signature-line"></div>
       <div class="signature-name">STEPHEN DUHANEY</div>
@@ -93,16 +94,17 @@
   </div>
 
   {% if not for_pdf %}
-    <div class="actions">
-      <a href="{% url 'invoice_update' invoice.pk %}" class="btn btn-outline-secondary btn-sm">Edit Invoice</a>
-      <a href="{% url 'invoice_pdf' invoice.pk %}" class="btn btn-primary btn-sm">Download PDF</a>
-      <a href="{% url 'clients_detail' invoice.client.pk %}" class="btn btn-outline-secondary btn-sm">View Client</a>
-      <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-sm">Back to Dashboard</a>
-      <form action="{% url 'invoice_delete' invoice.pk %}" method="post" onsubmit="return confirm('Delete this invoice? This action cannot be undone.');}">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger btn-sm">Delete Invoice</button>
-      </form>
-    </div>
+  <div class="actions">
+    <a href="{% url 'invoice_update' invoice.pk %}" class="btn btn-outline-secondary btn-sm">Edit Invoice</a>
+    <a href="{% url 'invoice_pdf' invoice.pk %}" class="btn btn-primary btn-sm">Download PDF</a>
+    <a href="{% url 'clients_detail' invoice.client.pk %}" class="btn btn-outline-secondary btn-sm">View Client</a>
+    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-sm">Back to Dashboard</a>
+    <form action="{% url 'invoice_delete' invoice.pk %}" method="post"
+      onsubmit="return confirm('Delete this invoice? This action cannot be undone.');}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger btn-sm">Delete Invoice</button>
+    </form>
+  </div>
   {% endif %}
 </div>
 

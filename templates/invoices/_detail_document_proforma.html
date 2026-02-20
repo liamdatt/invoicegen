@@ -62,6 +62,12 @@
             <td>{{ invoice.chassis_no }}</td>
           </tr>
           {% endif %}
+          {% if invoice.engine_no %}
+          <tr>
+            <th>Engine #</th>
+            <td>{{ invoice.engine_no }}</td>
+          </tr>
+          {% endif %}
           {% if invoice.proforma_colour %}
           <tr>
             <th>Colour</th>

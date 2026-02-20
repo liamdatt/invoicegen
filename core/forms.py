@@ -6,7 +6,7 @@ from django.forms import inlineformset_factory
 from .models import Client, Invoice, InvoiceItem, WhatsAppFollowUp, WhatsAppSettings
 
 
-INVOICE_SHARED_FIELDS = ("client", "invoice_type", "date", "chassis_no")
+INVOICE_SHARED_FIELDS = ("client", "invoice_type", "date", "chassis_no", "engine_no")
 INVOICE_GENERAL_FIELDS = ("vehicle", "lic_no")
 INVOICE_PROFORMA_FIELDS = (
     "proforma_make",

@@ -37,6 +37,7 @@ class Invoice(models.Model):
     vehicle = models.CharField(max_length=255, blank=True)
     lic_no = models.CharField("Lic#", max_length=50, blank=True)
     chassis_no = models.CharField("Chassis#", max_length=100, blank=True)
+    engine_no = models.CharField("Engine#", max_length=100, blank=True)
     date = models.DateField()
 
     proforma_make = models.CharField("Make", max_length=100, blank=True)
