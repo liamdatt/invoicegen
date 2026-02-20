@@ -26,9 +26,9 @@
       <div class="meta-col">
         <div><span class="meta-label">Client:</span> {{ invoice.client.name }}</div>
         <div><span class="meta-label">Vehicle:</span> {{ invoice.vehicle|default:"" }}</div>
-        <div><span class="meta-label">Lic#:</span> {{ invoice.lic_no|default:"" }}</div>
-        <div><span class="meta-label">Chassis#:</span> {{ invoice.chassis_no|default:"" }}</div>
-        <div><span class="meta-label">Engine#:</span> {{ invoice.engine_no|default:"" }}</div>
+        <div><span class="meta-label">Lic #:</span> {{ invoice.lic_no|default:"" }}</div>
+        <div><span class="meta-label">Chassis #:</span> {{ invoice.chassis_no|default:"" }}</div>
+        <div><span class="meta-label">Engine #:</span> {{ invoice.engine_no|default:"" }}</div>
       </div>
       <div class="meta-col align-end">
         <div><span class="meta-label">Date:</span> {{ invoice.date|date:"j-M-y" }}</div>
