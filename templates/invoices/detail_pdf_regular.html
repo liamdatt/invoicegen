@@ -1,0 +1,29 @@
+{% load static %}
+{% load humanize %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Invoice {{ invoice.invoice_number }}</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 0;
+      }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: 'Times New Roman', serif;
+        background: #f4f5f8;
+        padding: 0 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    {% include 'invoices/_detail_document_regular.html' with for_pdf=True %}
+  </body>
+</html>

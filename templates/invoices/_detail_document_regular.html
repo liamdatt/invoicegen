@@ -1,0 +1,367 @@
+{% load static %}
+{% load humanize %}
+<div class="invoice-screen proforma{% if for_pdf %} invoice-screen--pdf{% endif %}">
+  <div class="invoice-paper proforma{% if for_pdf %} invoice-paper--pdf{% endif %}">
+    <div class="invoice-header">
+      <div class="brand-block">
+        {% if for_pdf and logo_src %}
+        <img src="{{ logo_src }}" alt="Stepmath Auto Limited" class="brand-logo">
+        {% elif not for_pdf %}
+        {% static 'invoicegen/logo.jpeg' as logo_url %}
+        <img src="{{ logo_url }}" alt="Stepmath Auto Limited" class="brand-logo">
+        {% endif %}
+        <div class="brand-text">
+          <div class="brand-name">STEPMATH AUTO LIMITED</div>
+          <div class="brand-meta">(Certified Car Dealer)</div>
+          <div>94b Old Hope Road</div>
+          <div>Kingston 6</div>
+          <div>Tel: (876) 927-8281 / 978-0297</div>
+          <div>Email: stepmathauto100@gmail.com</div>
+          <div>GCT REG. NO. 001-621-840</div>
+        </div>
+      </div>
+      <div class="document-meta">
+        <div class="document-date">{{ invoice.date|date:"F j, Y" }}</div>
+        <div class="document-title">INVOICE</div>
+      </div>
+    </div>
+
+    <div class="recipient-block">
+      <p class="recipient-label">To:</p>
+      <p class="recipient-name">{{ invoice.client.name }}</p>
+      {% if invoice.client.address %}
+      <p class="recipient-address">{{ invoice.client.address|linebreaksbr }}</p>
+      {% endif %}
+    </div>
+
+    <div class="proforma-body">
+      <p class="intro">Please find below the details for the following motor vehicle:</p>
+
+      <table class="proforma-table">
+        <tbody>
+          {% if invoice.proforma_make %}
+          <tr>
+            <th>Make</th>
+            <td>{{ invoice.proforma_make }}</td>
+          </tr>
+          {% endif %}
+          {% if invoice.proforma_model %}
+          <tr>
+            <th>Model</th>
+            <td>{{ invoice.proforma_model }}</td>
+          </tr>
+          {% endif %}
+          {% if invoice.proforma_year %}
+          <tr>
+            <th>Year</th>
+            <td>{{ invoice.proforma_year }}</td>
+          </tr>
+          {% endif %}
+          {% if invoice.chassis_no %}
+          <tr>
+            <th>Chassis #</th>
+            <td>{{ invoice.chassis_no }}</td>
+          </tr>
+          {% endif %}
+          {% if invoice.engine_no %}
+          <tr>
+            <th>Engine #</th>
+            <td>{{ invoice.engine_no }}</td>
+          </tr>
+          {% endif %}
+          {% if invoice.proforma_colour %}
+          <tr>
+            <th>Colour</th>
+            <td>{{ invoice.proforma_colour }}</td>
+          </tr>
+          {% endif %}
+          {% if invoice.proforma_cc_rating %}
+          <tr>
+            <th>CC Rating</th>
+            <td>{{ invoice.proforma_cc_rating }}</td>
+          </tr>
+          {% endif %}
+          {% if invoice.vehicle %}
+          <tr>
+            <th>Description</th>
+            <td>{{ invoice.vehicle }}</td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+
+      {% if invoice.proforma_total_formatted %}
+      <div class="total-summary">
+        <span class="total-label">Total Cost:</span>
+        <span class="total-amount">{{ invoice.proforma_total_formatted }}</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="signature-block">
+      {% if for_pdf and signature_src %}
+      <img src="{{ signature_src }}" alt="Stephen Duhaney Signature" class="signature-image">
+      {% elif not for_pdf %}
+      {% static 'Stepmath_signature-no background.png' as signature_url %}
+      <img src="{{ signature_url }}" alt="Stephen Duhaney Signature" class="signature-image">
+      {% endif %}
+      <div class="signature-line"></div>
+      <div class="signature-name">STEPHEN DUHANEY</div>
+      <div class="signature-title">DIRECTOR</div>
+    </div>
+  </div>
+
+  {% if not for_pdf %}
+  <div class="actions">
+    <a href="{% url 'invoice_update' invoice.pk %}" class="btn btn-outline-secondary btn-sm">Edit Invoice</a>
+    <a href="{% url 'invoice_pdf' invoice.pk %}" class="btn btn-primary btn-sm">Download PDF</a>
+    <a href="{% url 'clients_detail' invoice.client.pk %}" class="btn btn-outline-secondary btn-sm">View Client</a>
+    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-sm">Back to Dashboard</a>
+    <form action="{% url 'invoice_delete' invoice.pk %}" method="post"
+      onsubmit="return confirm('Delete this invoice? This action cannot be undone.');">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger btn-sm">Delete Invoice</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+  .invoice-screen.proforma {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2.5rem 0;
+  }
+
+  .invoice-screen--pdf {
+    display: block;
+    padding: 0;
+  }
+
+  .invoice-paper.proforma {
+    background: #ffffff;
+    color: #111111;
+    width: 100%;
+    max-width: 750px;
+    margin: 0 auto;
+    padding: 3rem 3rem 2.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+    font-family: 'Times New Roman', serif;
+    box-sizing: border-box;
+  }
+
+  .invoice-paper--pdf {
+    box-shadow: none;
+    border: none;
+    max-width: 850px;
+    padding: 0.5rem 1.25rem 0.5rem;
+  }
+
+  .invoice-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .invoice-paper--pdf .invoice-header {
+    gap: 0.25rem;
+  }
+
+  .brand-logo {
+    width: 120px;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .invoice-paper--pdf .brand-logo {
+    width: 100px;
+  }
+
+  .document-meta {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .document-date {
+    font-size: 0.95rem;
+    letter-spacing: 0.05rem;
+  }
+
+  .document-title {
+    font-weight: 700;
+    font-size: 1.6rem;
+    letter-spacing: 0.35rem;
+  }
+
+  .invoice-paper--pdf .document-title {
+    font-size: 1.3rem;
+    letter-spacing: 0.18rem;
+  }
+
+  .recipient-block {
+    margin-top: 1.5rem;
+    line-height: 1.6;
+    font-size: 1rem;
+  }
+
+  .invoice-paper--pdf .recipient-block {
+    margin-top: 0.25rem;
+  }
+
+  .recipient-label {
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    letter-spacing: 0.05rem;
+  }
+
+  .recipient-name {
+    margin: 0;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08rem;
+  }
+
+  .recipient-address {
+    margin-top: 0.25rem;
+    white-space: pre-line;
+  }
+
+  .proforma-body {
+    margin-top: 1.75rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    page-break-inside: avoid;
+  }
+
+  .invoice-paper--pdf .proforma-body {
+    margin-top: 0.25rem;
+    font-size: 0.9rem;
+  }
+
+  .intro {
+    margin-bottom: 1.25rem;
+  }
+
+  .invoice-paper--pdf .intro {
+    margin-bottom: 0.25rem;
+  }
+
+  .proforma-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.75rem;
+  }
+
+  .invoice-paper--pdf .proforma-table {
+    margin-bottom: 0.25rem;
+  }
+
+  .proforma-table th,
+  .proforma-table td {
+    border: 1px solid #111111;
+    padding: 0.65rem 0.85rem;
+    text-align: left;
+  }
+
+  .invoice-paper--pdf .proforma-table th,
+  .invoice-paper--pdf .proforma-table td {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .proforma-table tbody tr {
+    page-break-inside: avoid;
+  }
+
+  .proforma-table th {
+    width: 32%;
+    background: #f7f7f7;
+    text-transform: uppercase;
+    letter-spacing: 0.08rem;
+    font-size: 0.85rem;
+  }
+
+  .invoice-paper--pdf .proforma-table th {
+    letter-spacing: 0.05rem;
+    font-size: 0.8rem;
+  }
+
+  .total-summary {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    align-items: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.04rem;
+  }
+
+  .invoice-paper--pdf .total-summary {
+    margin-top: 0.25rem;
+    font-size: 1rem;
+  }
+
+  .total-amount {
+    font-size: 1.2rem;
+  }
+
+  .total-summary,
+  .signature-block {
+    page-break-inside: avoid;
+  }
+
+  .signature-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1.5rem;
+    gap: 0.25rem;
+  }
+
+  .signature-image {
+    width: 100px;
+    height: auto;
+    object-fit: contain;
+    position: relative;
+    top: 8px;
+  }
+
+  .invoice-paper--pdf .signature-block {
+    margin-top: 0.25rem;
+  }
+
+  .signature-line {
+    width: 320px;
+    border-bottom: 1px solid #111111;
+    height: 1px;
+  }
+
+  .signature-name {
+    font-weight: 700;
+    letter-spacing: 0.08rem;
+  }
+
+  .signature-title {
+    font-size: 0.85rem;
+    letter-spacing: 0.1rem;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 1rem;
+  }
+
+  .actions form {
+    display: inline;
+  }
+</style>
