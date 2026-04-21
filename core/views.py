@@ -502,12 +502,8 @@ def invoice_pdf(request, pk: int):
 
     suffix = f"-{invoice.invoice_type.lower()}"
     needs_generation = force or not invoice.pdf_file or not invoice.pdf_file.name.endswith(f"{suffix}.pdf")
-    if invoice.invoice_type == Invoice.Type.GENERAL:
-        if needs_generation:
-            invoice.generate_general_pdf(overwrite=True, store_local=True)
-    else:
-        if needs_generation:
-            invoice.generate_proforma_pdf(overwrite=True, store_local=True)
+    if needs_generation:
+        invoice.generate_pdf_bytes(overwrite=True, store_local=True)
     if not invoice.pdf_file:
         return HttpResponse("Failed to generate invoice PDF.", status=500)
     return FileResponse(invoice.pdf_file.open('rb'), as_attachment=True, filename=invoice.pdf_filename())
