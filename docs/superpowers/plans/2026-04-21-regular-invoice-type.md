@@ -75,14 +75,13 @@ Add after the existing `proforma_*` fields, before `pdf_file`:
 
 ```python
 invoice_number = models.PositiveIntegerField(
-    unique=False,
     null=True,
     blank=True,
     db_index=True,
 )
 ```
 
-Note: `unique=False` for now — Task 3 alters it to `unique=True` after backfill.
+Note: no `unique` kwarg here (Django defaults to `unique=False`). Task 3 adds `unique=True` after the backfill runs. Keeping the two states different this way ensures `makemigrations` in Task 3 detects the change.
 
 - [ ] **Step 3: Generate the migration**
 
@@ -183,7 +182,16 @@ git commit -m "Backfill invoice_number from pk for existing invoices"
 
 - [ ] **Step 1: Change the field definition**
 
-In `core/models.py`, change the `invoice_number` field's `unique=False` to `unique=True`.
+In `core/models.py`, add `unique=True` to the `invoice_number` field. Final definition:
+
+```python
+invoice_number = models.PositiveIntegerField(
+    unique=True,
+    null=True,
+    blank=True,
+    db_index=True,
+)
+```
 
 - [ ] **Step 2: Generate the migration**
 
@@ -697,11 +705,11 @@ to:
 
 The existing JS at `form.html:407-417` already splits on comma and does case-insensitive matching. No JS change needed.
 
-- [ ] **Step 2: Smoke-test manually**
+- [ ] **Step 2: Smoke-test manually (form page only — do not submit)**
 
 Run: `venv/bin/python manage.py runserver` in one terminal.
 
-In a browser, log in, create a new invoice for any client, and verify:
+In a browser, log in and open the **new-invoice form page** for any client (do NOT submit — the detail-page dispatcher for REGULAR isn't wired yet; that's Task 11). Verify:
 - The type dropdown now includes "Regular" as an option.
 - Selecting "Regular" shows the same vehicle fields block as "Proforma".
 - Selecting "General" hides the vehicle block.
@@ -752,6 +760,8 @@ to:
 ```
 
 - Replace any remaining user-visible `{{ invoice.pk }}` with `{{ invoice.invoice_number }}` in this file (grep the file — if none, skip).
+
+Do **not** change `{% url 'invoice_update' invoice.pk %}`, `{% url 'invoice_pdf' invoice.pk %}`, or `{% url 'invoice_delete' invoice.pk %}` references (the template includes all three at approximately lines 115–119). Those are database-lookup args and must stay on `pk`.
 
 Do **not** rename the `proforma` CSS classes — they only scope styles within the template and are not user-visible.
 
