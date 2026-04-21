@@ -113,14 +113,14 @@ class Invoice(models.Model):
         with transaction.atomic():
             if invoice_type == cls.Type.REGULAR:
                 current_max = cls.objects.filter(
-                    invoice_type=cls.Type.REGULAR
+                    invoice_number__gte=cls.REGULAR_START
                 ).aggregate(m=models.Max('invoice_number'))['m']
                 if current_max is None:
                     return cls.REGULAR_START
                 return current_max + 1
 
             current_max = cls.objects.filter(
-                invoice_type__in=[cls.Type.GENERAL, cls.Type.PROFORMA]
+                invoice_number__lt=cls.REGULAR_START
             ).aggregate(m=models.Max('invoice_number'))['m'] or 0
             candidate = current_max + 1
             taken = set(

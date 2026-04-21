@@ -232,6 +232,16 @@ class InvoiceNumberingTests(TestCase):
         self._make(Invoice.Type.GENERAL, invoice_number=2001)
         self.assertEqual(Invoice.allocate_number(Invoice.Type.PROFORMA), 2003)
 
+    def test_regular_allocator_respects_number_claimed_by_former_regular(self) -> None:
+        # A Regular invoice numbered 2000 gets its type changed to Proforma.
+        # The number 2000 is still permanently assigned to that row, so the
+        # next Regular must skip to 2001 even though no rows currently have
+        # invoice_type=REGULAR.
+        inv = self._make(Invoice.Type.REGULAR, invoice_number=2000)
+        inv.invoice_type = Invoice.Type.PROFORMA
+        inv.save()
+        self.assertEqual(Invoice.allocate_number(Invoice.Type.REGULAR), 2001)
+
     def test_new_invoice_gets_number_assigned_on_save(self) -> None:
         inv = Invoice.objects.create(
             client=self.client_obj,
