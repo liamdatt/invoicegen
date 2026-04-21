@@ -88,6 +88,31 @@ class Invoice(models.Model):
     def total(self) -> Decimal:
         return (self.parts_subtotal + self.labour_subtotal + self.gct).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
+    @classmethod
+    def allocate_number(cls, invoice_type: str) -> int:
+        from django.db import transaction
+
+        with transaction.atomic():
+            if invoice_type == cls.Type.REGULAR:
+                current_max = cls.objects.filter(
+                    invoice_type=cls.Type.REGULAR
+                ).aggregate(m=models.Max('invoice_number'))['m']
+                if current_max is None:
+                    return cls.REGULAR_START
+                return current_max + 1
+
+            current_max = cls.objects.filter(
+                invoice_type__in=[cls.Type.GENERAL, cls.Type.PROFORMA]
+            ).aggregate(m=models.Max('invoice_number'))['m'] or 0
+            candidate = current_max + 1
+            taken = set(
+                cls.objects.filter(invoice_number__gte=candidate)
+                           .values_list('invoice_number', flat=True)
+            )
+            while candidate in taken:
+                candidate += 1
+            return candidate
+
     def _money(self, v: Decimal | None, currency: str | None = None) -> str:
         if v is None:
             return ""

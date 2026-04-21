@@ -193,3 +193,41 @@ class GoogleEmailTests(TestCase):
         self.assertEqual(kwargs["maintype"], "application")
         self.assertEqual(kwargs["subtype"], "pdf")
         self.assertEqual(kwargs["filename"], "invoice.pdf")
+
+
+class InvoiceNumberingTests(TestCase):
+    def setUp(self) -> None:
+        self.client_obj = Client.objects.create(name="Numbering Client")
+
+    def _make(self, invoice_type: str, invoice_number: int | None = None) -> Invoice:
+        kwargs = dict(
+            client=self.client_obj,
+            invoice_type=invoice_type,
+            date=timezone.localdate(),
+        )
+        if invoice_number is not None:
+            kwargs['invoice_number'] = invoice_number
+        return Invoice.objects.create(**kwargs)
+
+    def test_allocate_first_regular_uses_start(self) -> None:
+        self.assertEqual(Invoice.allocate_number(Invoice.Type.REGULAR), 2000)
+
+    def test_allocate_next_regular_increments(self) -> None:
+        self._make(Invoice.Type.REGULAR, invoice_number=2000)
+        self.assertEqual(Invoice.allocate_number(Invoice.Type.REGULAR), 2001)
+
+    def test_allocate_first_general_is_one(self) -> None:
+        self.assertEqual(Invoice.allocate_number(Invoice.Type.GENERAL), 1)
+
+    def test_allocate_general_continues_from_max(self) -> None:
+        self._make(Invoice.Type.GENERAL, invoice_number=5)
+        self._make(Invoice.Type.PROFORMA, invoice_number=7)
+        self.assertEqual(Invoice.allocate_number(Invoice.Type.GENERAL), 8)
+
+    def test_allocate_general_skips_regular_numbers(self) -> None:
+        self._make(Invoice.Type.PROFORMA, invoice_number=1999)
+        self._make(Invoice.Type.REGULAR, invoice_number=2000)
+        self._make(Invoice.Type.REGULAR, invoice_number=2002)
+        self.assertEqual(Invoice.allocate_number(Invoice.Type.GENERAL), 2001)
+        self._make(Invoice.Type.GENERAL, invoice_number=2001)
+        self.assertEqual(Invoice.allocate_number(Invoice.Type.PROFORMA), 2003)
