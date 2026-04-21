@@ -58,30 +58,29 @@ Nullable at the schema level so the backfill migration can run in two steps. In 
 @classmethod
 def allocate_number(cls, invoice_type: str) -> int:
     with transaction.atomic():
-        qs = cls.objects.select_for_update()
         if invoice_type == cls.Type.REGULAR:
-            current_max = qs.filter(invoice_type=cls.Type.REGULAR) \
-                            .aggregate(m=models.Max('invoice_number'))['m']
+            current_max = cls.objects.filter(invoice_type=cls.Type.REGULAR) \
+                             .aggregate(m=models.Max('invoice_number'))['m']
             return max(cls.REGULAR_START, (current_max or (cls.REGULAR_START - 1)) + 1)
         else:
-            current_max = qs.filter(
+            current_max = cls.objects.filter(
                 invoice_type__in=[cls.Type.GENERAL, cls.Type.PROFORMA]
             ).aggregate(m=models.Max('invoice_number'))['m'] or 0
             candidate = current_max + 1
             taken = set(
-                qs.filter(invoice_number__gte=candidate)
-                  .values_list('invoice_number', flat=True)
+                cls.objects.filter(invoice_number__gte=candidate)
+                           .values_list('invoice_number', flat=True)
             )
             while candidate in taken:
                 candidate += 1
             return candidate
 ```
 
-- `select_for_update()` is a no-op on SQLite (dev) and a real row lock on Postgres (prod). Safe in both.
 - The Regular branch never scans existing General/Proforma numbers because Regulars start at 2000, well above the current high-water (16).
 - The General/Proforma branch scans the "taken" set above its candidate so it can walk past any Regular-assigned number once the sequence catches up to 2000.
+- **Concurrency.** `select_for_update()` was considered but its row-lock semantics don't help here: we're aggregating, not locking specific rows. Instead the allocator relies on the `unique=True` constraint on `invoice_number` as the serialization point: if two concurrent creates allocate the same number, one `INSERT` succeeds and the other raises `IntegrityError`. Callers (`Invoice.save()`) catch `IntegrityError`, re-run `allocate_number()`, and retry the insert up to 3 times. On SQLite (dev), writes are serialized at the connection level so the retry loop is effectively unreachable. On Postgres (prod), the retry loop is the actual correctness mechanism.
 
-**`save()` override.** On insert (`self.pk is None`) and when `invoice_number is None`, call `allocate_number(self.invoice_type)` and assign before the DB insert. On update, leave `invoice_number` untouched. This guarantees numbers are permanent.
+**`save()` override.** On insert (`self.pk is None` and `self.invoice_number is None`), call `allocate_number(self.invoice_type)`, assign, and attempt the insert inside a retry loop: on `IntegrityError` caused by the `invoice_number` unique constraint, re-allocate and retry (max 3 attempts). On update, leave `invoice_number` untouched. Numbers are permanent across type edits; a direct `Invoice.objects.update(...)` or explicit external assignment of `invoice_number` also bypasses allocation (intentional — allows data repair).
 
 ### 2. Migrations
 
@@ -101,12 +100,13 @@ Keeping backfill and uniqueness in separate migrations avoids the pitfall of a s
 ### 3. Form & UI
 
 **`core/forms.py`:**
-- `INVOICE_REGULAR_FIELDS` = same field tuple as `INVOICE_PROFORMA_FIELDS` (single-vehicle block).
-- Extend `InvoiceForm` field selection so Regular uses the same sub-form shape as Proforma.
+- No new field-list constants. `InvoiceForm.Meta.fields` already includes `INVOICE_PROFORMA_FIELDS`; Regular reuses those fields unchanged.
+- Extend `InvoiceForm.clean()` so the required-field check for `proforma_make`, `proforma_model`, `proforma_price` applies to both `PROFORMA` and `REGULAR` (currently hardcoded to `PROFORMA` at forms.py:109). Error messages should read "required for this invoice type" rather than "required for proforma invoices."
+- No change to the `data-proforma-required` widget attributes — they continue to annotate the same three fields for both types.
 
 **`templates/invoices/form.html`:**
 - Add "Regular" option to the type dropdown.
-- The JS/template logic that currently swaps between the General line-item grid and the Proforma single-vehicle fields: extend so Regular shows the Proforma field set. No new visibility branch — Regular and Proforma use the exact same field block.
+- One-attribute diff on the single-vehicle field section: change `data-invoice-type-visible="PROFORMA"` to `data-invoice-type-visible="PROFORMA,REGULAR"`. The existing JS at form.html:408–410 already splits on comma and does case-insensitive matching, so no JS change is needed.
 - Dropdown remains editable on edit (per non-goals). Numbers are protected by the `save()` override, not by UI constraints.
 
 ### 4. PDF templates
@@ -118,14 +118,19 @@ Keeping backfill and uniqueness in separate migrations avoids the pitfall of a s
   3. Remove the `proforma` CSS class from the outer `.invoice-screen` / `.invoice-paper` divs (or rename styles if coupling is tight — decide during implementation).
 - `templates/invoices/detail_pdf_regular.html` — copy of `detail_pdf_proforma.html` with `<title>Invoice {{ invoice.invoice_number }}</title>` and the include pointed at `_detail_document_regular.html`.
 
-**Existing templates updated to use `invoice_number` instead of `invoice.pk` for display:**
+**Existing templates and code updated to use `invoice_number` instead of `invoice.pk` for display:**
 - `templates/dashboard.html` (line 282)
 - `templates/clients/detail.html` (line 117)
 - `templates/emails/invoice_email.txt` (line 3)
 - `templates/invoices/detail_pdf.html` and `detail_pdf_proforma.html` (title tags)
 - `templates/invoices/_detail_document_general.html`, `_detail_document_proforma.html`, and the new `_detail_document_regular.html` wherever a number is shown
+- `core/views.py:550` — `subject = f"Invoice #{invoice.invoice_number}"` in `invoice_send_email` (customer-visible email subject)
 
 **URL `{% url 'invoice_pdf' invoice.pk %}` references stay on `pk`** — those are database lookups, not user-facing numbers, and the URL routing still goes by primary key.
+
+**Internal-only references stay on `pk`** — e.g., `core/management/commands/regenerate_pdfs.py` uses `invoice.pk` in log output, which is fine for operator-facing logs.
+
+**Drive filenames.** `core/google.py::upload_invoice_pdf` uses the filename only as the Drive file's display name (no parsing). New uploads will use `invoice-{invoice_number}-…`. Existing Drive files keep their old `invoice-{pk}-…` names; for the 16 rows already in the DB, `invoice_number == pk` after backfill, so there's no visible inconsistency.
 
 ### 5. Invoice class plumbing
 
@@ -159,10 +164,12 @@ def generate_pdf_bytes(self, overwrite=False, store_local=False) -> tuple[str, b
 
 Also update the existing `generate_general_pdf` / `generate_proforma_pdf` filename strings to use `self.invoice_number` instead of `self.pk` for consistency with customer-visible numbering.
 
-### 6. Views (`core/views.py`)
+### 6. Views and partial dispatch
 
-- `invoice_detail` selects the partial (`_detail_document_general.html` / `_detail_document_proforma.html` / `_detail_document_regular.html`) based on `invoice.invoice_type`. Likely already a small dispatch — extend.
-- `invoice_pdf`, `invoice_send_email`: no logic changes; all dispatch now flows through `generate_pdf_bytes()`.
+- The PDF-template dispatch lives entirely in `Invoice.generate_pdf_bytes()` (model-layer), not in any view. The `REGULAR` branch is added there (see §5).
+- `core/views.py::invoice_detail` renders the wrapper `templates/invoices/detail.html`, which is responsible for including the right on-screen document partial based on `invoice.invoice_type`. Extend the include logic in `detail.html` (or in the partials it already picks) to cover `REGULAR → _detail_document_regular.html`.
+- `invoice_pdf`: no changes (flows through `generate_pdf_bytes()`).
+- `invoice_send_email`: update the hardcoded `subject = f"Invoice #{invoice.pk}"` (views.py:550) to use `invoice.invoice_number`. No other logic changes.
 
 ### 7. Tests (`core/tests.py`)
 
@@ -199,8 +206,9 @@ render PDF (GET /invoices/<id>/pdf/)
 
 ## Error handling
 
-- Allocator runs inside `transaction.atomic()`; if the surrounding request transaction rolls back, the allocated number is never persisted (and the primary key is never consumed either, since the insert is part of the same transaction).
-- Concurrent creates on Postgres are serialized by `select_for_update()` on the Invoice table; on SQLite, Django's default per-connection locking serializes writes.
+- Allocator runs inside `transaction.atomic()`; if the surrounding request transaction rolls back, the allocated number is never persisted.
+- Concurrency correctness comes from the `unique=True` constraint on `invoice_number`: two concurrent creates that allocate the same number will have exactly one insert succeed; the loser catches `IntegrityError`, re-allocates, and retries (max 3 attempts in `Invoice.save()`). `select_for_update()` was deliberately not used because aggregate queries don't lock rows meaningfully.
+- `InvoiceForm.clean()` enforces that `proforma_make`, `proforma_model`, and `proforma_price` are present for both `PROFORMA` and `REGULAR` types.
 - If `allocate_number()` is called with an unrecognized `invoice_type`, treat it as General/Proforma (default branch). In practice the form choices prevent this path.
 
 ## Rollout
