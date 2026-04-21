@@ -1,5 +1,7 @@
 {% if invoice.invoice_type == 'PROFORMA' %}
   {% include 'invoices/_detail_document_proforma.html' %}
+{% elif invoice.invoice_type == 'REGULAR' %}
+  {% include 'invoices/_detail_document_regular.html' %}
 {% else %}
   {% include 'invoices/_detail_document_general.html' %}
 {% endif %}
