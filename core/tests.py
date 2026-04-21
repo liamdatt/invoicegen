@@ -318,3 +318,56 @@ class InvoicePdfDispatchTests(TestCase):
             filename, _ = inv.generate_pdf_bytes(overwrite=False, store_local=False)
         mock_render.assert_called_once_with("invoices/detail_pdf_proforma.html")
         self.assertEqual(filename, f"invoice-{inv.invoice_number}-proforma.pdf")
+
+
+from core.forms import InvoiceForm
+
+
+class InvoiceFormCleanTests(TestCase):
+    def setUp(self) -> None:
+        self.client_obj = Client.objects.create(name="Form Client")
+
+    def _form(self, invoice_type: str, **extra) -> InvoiceForm:
+        data = {
+            "client": self.client_obj.pk,
+            "invoice_type": invoice_type,
+            "date": timezone.localdate().isoformat(),
+            "chassis_no": "",
+            "engine_no": "",
+            "vehicle": "",
+            "lic_no": "",
+            "proforma_make": "",
+            "proforma_model": "",
+            "proforma_year": "",
+            "proforma_colour": "",
+            "proforma_cc_rating": "",
+            "proforma_price": "",
+            "proforma_currency": "",
+        }
+        data.update(extra)
+        return InvoiceForm(data=data)
+
+    def test_regular_requires_make_model_price(self) -> None:
+        form = self._form(Invoice.Type.REGULAR)
+        self.assertFalse(form.is_valid())
+        self.assertIn("proforma_make", form.errors)
+        self.assertIn("proforma_model", form.errors)
+        self.assertIn("proforma_price", form.errors)
+
+    def test_regular_valid_with_required_fields(self) -> None:
+        form = self._form(
+            Invoice.Type.REGULAR,
+            proforma_make="Toyota",
+            proforma_model="Corolla",
+            proforma_price="250000",
+        )
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_general_does_not_require_proforma_fields(self) -> None:
+        form = self._form(Invoice.Type.GENERAL)
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_proforma_still_requires_make_model_price(self) -> None:
+        form = self._form(Invoice.Type.PROFORMA)
+        self.assertFalse(form.is_valid())
+        self.assertIn("proforma_make", form.errors)

@@ -106,7 +106,7 @@ class InvoiceForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         invoice_type = cleaned_data.get("invoice_type")
-        if invoice_type == Invoice.Type.PROFORMA:
+        if invoice_type in (Invoice.Type.PROFORMA, Invoice.Type.REGULAR):
             required_fields = {
                 "proforma_make": "Make",
                 "proforma_model": "Model",
@@ -114,7 +114,7 @@ class InvoiceForm(forms.ModelForm):
             }
             for field_name, label in required_fields.items():
                 if not cleaned_data.get(field_name):
-                    self.add_error(field_name, f"{label} is required for proforma invoices.")
+                    self.add_error(field_name, f"{label} is required for this invoice type.")
         return cleaned_data
 
 
