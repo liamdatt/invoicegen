@@ -241,28 +241,41 @@ class Invoice(models.Model):
             self.pdf_file.save(filename, ContentFile(pdf_content), save=True)
 
     def generate_general_pdf(self, overwrite: bool = True, store_local: bool = True) -> bytes:
-        filename = f"invoice-{self.pk}-general.pdf"
+        filename = f"invoice-{self.invoice_number}-general.pdf"
         pdf_content = self._render_pdf("invoices/detail_pdf.html")
         if store_local:
             self._store_pdf(filename, pdf_content, overwrite=overwrite)
         return pdf_content
 
     def generate_proforma_pdf(self, overwrite: bool = True, store_local: bool = True) -> bytes:
-        filename = f"invoice-{self.pk}-proforma.pdf"
+        filename = f"invoice-{self.invoice_number}-proforma.pdf"
         pdf_content = self._render_pdf("invoices/detail_pdf_proforma.html")
         if store_local:
             self._store_pdf(filename, pdf_content, overwrite=overwrite)
         return pdf_content
 
+    def generate_regular_pdf(self, overwrite: bool = True, store_local: bool = True) -> bytes:
+        filename = f"invoice-{self.invoice_number}-regular.pdf"
+        pdf_content = self._render_pdf("invoices/detail_pdf_regular.html")
+        if store_local:
+            self._store_pdf(filename, pdf_content, overwrite=overwrite)
+        return pdf_content
+
     def pdf_filename(self) -> str:
-        suffix = "general" if self.invoice_type == Invoice.Type.GENERAL else "proforma"
-        return f"invoice-{self.pk}-{suffix}.pdf"
+        suffix = {
+            Invoice.Type.GENERAL: "general",
+            Invoice.Type.PROFORMA: "proforma",
+            Invoice.Type.REGULAR: "regular",
+        }[self.invoice_type]
+        return f"invoice-{self.invoice_number}-{suffix}.pdf"
 
     def generate_pdf_bytes(self, overwrite: bool = False, store_local: bool = False) -> tuple[str, bytes]:
         if self.invoice_type == Invoice.Type.GENERAL:
             content = self.generate_general_pdf(overwrite=overwrite, store_local=store_local)
-        else:
+        elif self.invoice_type == Invoice.Type.PROFORMA:
             content = self.generate_proforma_pdf(overwrite=overwrite, store_local=store_local)
+        else:
+            content = self.generate_regular_pdf(overwrite=overwrite, store_local=store_local)
         return self.pdf_filename(), content
 
     def mark_drive_file(

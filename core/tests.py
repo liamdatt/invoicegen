@@ -281,3 +281,40 @@ class InvoiceNumberingTests(TestCase):
             invoice_number=42,
         )
         self.assertEqual(inv.invoice_number, 42)
+
+
+class InvoicePdfDispatchTests(TestCase):
+    def setUp(self) -> None:
+        self.client_obj = Client.objects.create(name="PDF Client")
+
+    def _make(self, invoice_type: str) -> Invoice:
+        return Invoice.objects.create(
+            client=self.client_obj,
+            invoice_type=invoice_type,
+            date=timezone.localdate(),
+        )
+
+    def test_pdf_filename_uses_invoice_number_and_type_suffix(self) -> None:
+        inv = self._make(Invoice.Type.REGULAR)
+        self.assertEqual(inv.pdf_filename(), f"invoice-{inv.invoice_number}-regular.pdf")
+
+        inv2 = self._make(Invoice.Type.GENERAL)
+        self.assertEqual(inv2.pdf_filename(), f"invoice-{inv2.invoice_number}-general.pdf")
+
+        inv3 = self._make(Invoice.Type.PROFORMA)
+        self.assertEqual(inv3.pdf_filename(), f"invoice-{inv3.invoice_number}-proforma.pdf")
+
+    def test_generate_pdf_bytes_dispatches_regular_template(self) -> None:
+        inv = self._make(Invoice.Type.REGULAR)
+        with patch.object(Invoice, '_render_pdf', return_value=b"%PDF-test") as mock_render:
+            filename, content = inv.generate_pdf_bytes(overwrite=False, store_local=False)
+        mock_render.assert_called_once_with("invoices/detail_pdf_regular.html")
+        self.assertEqual(filename, f"invoice-{inv.invoice_number}-regular.pdf")
+        self.assertEqual(content, b"%PDF-test")
+
+    def test_generate_pdf_bytes_still_dispatches_proforma(self) -> None:
+        inv = self._make(Invoice.Type.PROFORMA)
+        with patch.object(Invoice, '_render_pdf', return_value=b"%PDF-p") as mock_render:
+            filename, _ = inv.generate_pdf_bytes(overwrite=False, store_local=False)
+        mock_render.assert_called_once_with("invoices/detail_pdf_proforma.html")
+        self.assertEqual(filename, f"invoice-{inv.invoice_number}-proforma.pdf")
