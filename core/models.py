@@ -30,6 +30,9 @@ class Invoice(models.Model):
     class Type(models.TextChoices):
         GENERAL = 'GENERAL', 'General'
         PROFORMA = 'PROFORMA', 'Proforma'
+        REGULAR = 'REGULAR', 'Regular'
+
+    REGULAR_START = 2000
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='invoices')
     invoice_type = models.CharField(max_length=10, choices=Type.choices, default=Type.GENERAL)
@@ -47,6 +50,12 @@ class Invoice(models.Model):
     proforma_cc_rating = models.CharField("CC Rating", max_length=50, blank=True)
     proforma_price = models.DecimalField("Total Cost", max_digits=15, decimal_places=2, blank=True, null=True)
     proforma_currency = models.CharField("Currency", max_length=10, blank=True, default="JMD")
+
+    invoice_number = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        db_index=True,
+    )
 
     pdf_file = models.FileField(upload_to='invoices/', blank=True, null=True)
     drive_file_id = models.CharField(max_length=255, blank=True)
