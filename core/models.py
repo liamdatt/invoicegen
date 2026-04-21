@@ -52,6 +52,7 @@ class Invoice(models.Model):
     proforma_currency = models.CharField("Currency", max_length=10, blank=True, default="JMD")
 
     invoice_number = models.PositiveIntegerField(
+        unique=True,
         null=True,
         blank=True,
         db_index=True,
