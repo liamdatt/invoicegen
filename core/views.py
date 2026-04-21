@@ -547,7 +547,7 @@ def invoice_send_email(request, pk: int):
                 drive_file.get('webViewLink'),
                 drive_file.get('webContentLink'),
             )
-        subject = f"Invoice #{invoice.pk}"
+        subject = f"Invoice #{invoice.invoice_number}"
         sender_name = request.user.get_full_name() or request.user.username
         body = render_to_string(
             'emails/invoice_email.txt',

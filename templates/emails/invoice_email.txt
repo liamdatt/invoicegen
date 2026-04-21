@@ -1,6 +1,6 @@
 Hello {{ invoice.client.name }},
 
-Please find your invoice (#{% if invoice.pk %}{{ invoice.pk }}{% endif %}) attached to this email.
+Please find your invoice (#{% if invoice.invoice_number %}{{ invoice.invoice_number }}{% endif %}) attached to this email.
 
 {% if invoice.invoice_type == 'PROFORMA' %}This proforma invoice covers {{ invoice.proforma_make }} {{ invoice.proforma_model }}.{% else %}This invoice covers work completed on {{ invoice.vehicle|default:'your vehicle' }}.{% endif %}
 

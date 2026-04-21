@@ -279,7 +279,7 @@
                     <div>
                       <a href="{% url 'invoice_detail' inv.pk %}" class="fw-bold text-decoration-none"
                         style="color: var(--text-primary);">
-                        Invoice #{{ inv.pk }}
+                        Invoice #{{ inv.invoice_number }}
                       </a>
                       <div class="small text-muted">
                         <i class="bi bi-person me-1"></i>{{ inv.client.name }}

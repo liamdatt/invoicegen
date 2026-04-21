@@ -114,7 +114,7 @@
                       <div>
                         <h6 class="mb-1 fw-semibold">
                           <a href="{% url 'invoice_detail' inv.pk %}" class="text-decoration-none">
-                            Invoice #{{ inv.pk }}
+                            Invoice #{{ inv.invoice_number }}
                           </a>
                         </h6>
                         <div class="small text-muted">{{ inv.get_invoice_type_display }}</div>
