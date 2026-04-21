@@ -231,3 +231,53 @@ class InvoiceNumberingTests(TestCase):
         self.assertEqual(Invoice.allocate_number(Invoice.Type.GENERAL), 2001)
         self._make(Invoice.Type.GENERAL, invoice_number=2001)
         self.assertEqual(Invoice.allocate_number(Invoice.Type.PROFORMA), 2003)
+
+    def test_new_invoice_gets_number_assigned_on_save(self) -> None:
+        inv = Invoice.objects.create(
+            client=self.client_obj,
+            invoice_type=Invoice.Type.GENERAL,
+            date=timezone.localdate(),
+        )
+        self.assertIsNotNone(inv.invoice_number)
+
+    def test_first_regular_from_empty_db_gets_2000(self) -> None:
+        inv = Invoice.objects.create(
+            client=self.client_obj,
+            invoice_type=Invoice.Type.REGULAR,
+            date=timezone.localdate(),
+        )
+        self.assertEqual(inv.invoice_number, 2000)
+
+    def test_saving_again_does_not_change_number(self) -> None:
+        inv = Invoice.objects.create(
+            client=self.client_obj,
+            invoice_type=Invoice.Type.GENERAL,
+            date=timezone.localdate(),
+        )
+        original = inv.invoice_number
+        inv.vehicle = "updated"
+        inv.save()
+        inv.refresh_from_db()
+        self.assertEqual(inv.invoice_number, original)
+
+    def test_changing_type_does_not_reassign_number(self) -> None:
+        inv = Invoice.objects.create(
+            client=self.client_obj,
+            invoice_type=Invoice.Type.PROFORMA,
+            date=timezone.localdate(),
+        )
+        original = inv.invoice_number
+        inv.invoice_type = Invoice.Type.REGULAR
+        inv.save()
+        inv.refresh_from_db()
+        self.assertEqual(inv.invoice_number, original)
+        self.assertLess(inv.invoice_number, 2000)
+
+    def test_explicit_invoice_number_is_respected(self) -> None:
+        inv = Invoice.objects.create(
+            client=self.client_obj,
+            invoice_type=Invoice.Type.GENERAL,
+            date=timezone.localdate(),
+            invoice_number=42,
+        )
+        self.assertEqual(inv.invoice_number, 42)

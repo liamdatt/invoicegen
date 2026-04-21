@@ -70,6 +70,24 @@ class Invoice(models.Model):
     def __str__(self) -> str:
         return f"{self.get_invoice_type_display()} #{self.pk or 'new'} - {self.client.name}"
 
+    def save(self, *args, **kwargs):
+        from django.db import IntegrityError, transaction
+
+        if self.pk is not None or self.invoice_number is not None:
+            return super().save(*args, **kwargs)
+
+        last_error = None
+        for _ in range(3):
+            self.invoice_number = Invoice.allocate_number(self.invoice_type)
+            try:
+                with transaction.atomic():
+                    return super().save(*args, **kwargs)
+            except IntegrityError as exc:
+                last_error = exc
+                self.invoice_number = None
+                continue
+        raise last_error
+
     @property
     def parts_subtotal(self) -> Decimal:
         v = self.items.aggregate(total=models.Sum('parts_cost'))['total'] or Decimal('0')
